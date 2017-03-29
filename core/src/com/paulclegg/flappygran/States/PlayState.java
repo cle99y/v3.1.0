@@ -13,7 +13,9 @@ import com.paulclegg.flappygran.Preferences;
 import com.paulclegg.flappygran.Sprites.Cake;
 import com.paulclegg.flappygran.Sprites.GameScore;
 import com.paulclegg.flappygran.Sprites.Gran;
+import com.paulclegg.flappygran.Sprites.MakeEffect;
 import com.paulclegg.flappygran.Sprites.Tube;
+import com.paulclegg.flappygran.Utility.SineWave;
 
 /**
  * Created by cle99 on 26/03/2017.
@@ -37,25 +39,31 @@ public class PlayState extends States {
     private SpriteBatch batch;
     public GameScore gameScore;
     private int scoringTube;
-    private boolean gameover;
+    public static boolean gameOver;
+    SineWave sineWave;
 
 
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
-        gameover = false;
+        sineWave = new SineWave();
+        gameOver = false;
         scoringTube = 0;
         gameScore = new GameScore();
         layout = new GlyphLayout();
         font = new BitmapFont(Gdx.files.internal("flappygran.fnt"));
         font.getData().setScale(1.6f);
+
         gran = new Gran(50, FlappyGran.HEIGHT / 2);
+        MakeEffect.normal();
+
         camera.setToOrtho(false, FlappyGran.WIDTH, FlappyGran.HEIGHT);
         gui.setToOrtho(false, FlappyGran.WIDTH, FlappyGran.HEIGHT);
         bg = new Texture("bg.png");
         ground = new Texture("ground.png");
         tubes = new Array<Tube>();
         cakes = new Array<Cake>();
+
 
 
         for (int i = 0; i < NUMBER_OF_TUBES; i++) {
@@ -80,6 +88,7 @@ public class PlayState extends States {
     public void update(float dt) {
         handleInput();
         gran.update(dt);
+        sineWave.getSin();
         camera.position.x = gran.getPosition().x + camera.viewportWidth * 0.25f;
 
         for (int i = 0; i < tubes.size; i++) {
@@ -95,6 +104,10 @@ public class PlayState extends States {
             if (tubes.get(scoringTube).getPosBottomTube().x + Tube.TUBE_WIDTH < gran.getPosition().x ) {
                 gameScore.addToScore(TUBE_POINT);
                 tube.incrementTubesPassed();
+
+                // reset ghost status
+                if (Gran.isGhost) MakeEffect.normal();
+
                 if (scoringTube < tubes.size - 1) {
                     scoringTube++; ;
                 } else {
@@ -102,22 +115,33 @@ public class PlayState extends States {
                 }
             }
 
-            if (tube.collides(gran.getBounds("bottom")) ||
-                    tube.collides(gran.getBounds("top")) ||
-                    gran.getPosition().y < FlappyGran.HEIGHT * 0.2f) {
-                gameover = true;
-                gsm.set(new GameOver(gsm, gameScore.getScore()));
-                tube.resetTubes();
-                if (gameScore.getScore() > Preferences.getHighScore()) {
-                    Preferences.setHighScore(gameScore.getScore());
+            if (!Gran.isGhost) {  // if the ghost effect is implemented, gran can pass through tubes
+
+                // detect collisions between gran and tube or ground
+                if (tube.collides(gran.getBounds("bottom")) ||
+                        tube.collides(gran.getBounds("top")) ||
+                        gran.getPosition().y < FlappyGran.HEIGHT * 0.2f) {
+                    gameOver = true;
+
+                    // switch to game over screen
+                    gsm.set(new GameOver(gsm, gameScore.getScore()));
+                    tube.resetTubes();
+
+                    // check High Score status and reset current score to zero
+                    if (gameScore.getScore() > Preferences.getHighScore()) {
+                        Preferences.setHighScore(gameScore.getScore());
+                    }
+                    gameScore.reset();
                 }
-                gameScore.reset();
             }
 
             if (!cakes.get(scoringTube).isEaten() && tube.getTubesPassed() > 3) {
                 if (Intersector.overlaps(gran.getBounds("bottom"), cakes.get(scoringTube).getBounds())) {
                     gameScore.addToScore(CAKE_POINT);
                     cakes.get(scoringTube).nowEaten();
+                    if (cakes.get(scoringTube).getEffect() == "GRAVITY") {
+                        gran.jump(); gran.jump();  //double jump
+                    }
                     tubes.get(scoringTube).setGap(cakes.get(scoringTube).isEaten());
                 }
             }
@@ -147,8 +171,10 @@ public class PlayState extends States {
         }
 
         sb.draw(ground, camera.position.x - camera.viewportWidth /2, 0, camera.viewportWidth, camera.viewportHeight * 0.2f);
-        sb.draw(gran.getGran(), gran.getPosition().x, gran.getPosition().y,
-                Gran.PLAYER_SIZE, Gran.PLAYER_SIZE);
+        if (!gameOver) {
+            sb.draw(gran.getGran(), gran.getPosition().x, gran.getPosition().y,
+                    Gran.PLAYER_SIZE, Gran.PLAYER_SIZE);
+        }
         sb.end();
 
         // gui camera below (fixed)
@@ -182,6 +208,10 @@ public class PlayState extends States {
 //        sr.end();
 
     }
+
+
+
+
 
     @Override
     public void dispose() {

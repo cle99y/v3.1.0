@@ -26,6 +26,7 @@ public class GameOver extends States {
     private GlyphLayout textLayout;
     private int lastScore;
 
+
     public GameOver(GameStateManager gsm, int last) {
         super(gsm);
         lastScore = last;

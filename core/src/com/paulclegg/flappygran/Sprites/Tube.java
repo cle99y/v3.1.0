@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.paulclegg.flappygran.Utility.SineWave;
 
 import java.util.Random;
 
@@ -18,19 +19,22 @@ public class Tube {
     private static int LOW_OPENING = Math.round(com.paulclegg.flappygran.FlappyGran.HEIGHT * 0.3f);
     public static int TUBE_WIDTH = Math.round(com.paulclegg.flappygran.FlappyGran.WIDTH * 0.13f);
     public static int tubesPassed = 0;
+    public static boolean sliding = false;
 
     private Texture topTube, botttomTube;
     private Vector2 posTopTube, posBottomTube;
     private Rectangle boundsTop, boundsBottom;
     private Random random;
     private int TUBE_GAP = Math.round(com.paulclegg.flappygran.FlappyGran.HEIGHT * 0.21f);
+    //for testing
+    //private int TUBE_GAP = 500;
     private static int INITIAL_GAP = 100;
-    private int gap;
     private GameScore gamescore;
+    private SineWave sineWave;
 
 
     public Tube (float x) {
-        System.out.println("gap: " + TUBE_GAP);
+
         gamescore = new GameScore();
         topTube = new Texture("toptube.png");
         botttomTube = new Texture("bottomtube.png");
@@ -43,6 +47,7 @@ public class Tube {
                 TUBE_WIDTH, topTube.getHeight());
         boundsBottom = new Rectangle(posBottomTube.x, posBottomTube.y,
                 TUBE_WIDTH, botttomTube.getHeight());
+        sineWave = new SineWave();
 
     }
 
@@ -62,6 +67,7 @@ public class Tube {
         }
     }
 
+
     public Texture getTopTube() {
         return topTube;
     }
@@ -71,10 +77,22 @@ public class Tube {
     }
 
     public Vector2 getPosTopTube() {
+        if (sliding) {
+
+            posTopTube.set(posTopTube.x, (float) (sineWave.getSin() + 2f) / 2 * FLUCTUATION + INITIAL_GAP + LOW_OPENING);
+            boundsTop.set(posTopTube.x, posTopTube.y, TUBE_WIDTH, topTube.getHeight());
+            return posTopTube;
+        }
         return posTopTube;
     }
 
     public Vector2 getPosBottomTube() {
+
+        if (sliding) {
+            posBottomTube.set(posBottomTube.x, posTopTube.y - TUBE_GAP - botttomTube.getHeight());
+            boundsBottom.set(posBottomTube.x, posBottomTube.y, TUBE_WIDTH, botttomTube.getHeight());
+            return posBottomTube;
+        }
         return posBottomTube;
     }
 
@@ -92,18 +110,27 @@ public class Tube {
     }
 
     public void reposition(float x) {
+
+        if (sliding) {
+            posTopTube.set(x, (float) (sineWave.getSin() + 2f) / 2 * FLUCTUATION + INITIAL_GAP + LOW_OPENING);
+        } else {
+            posTopTube.set(x, random.nextInt(FLUCTUATION) + INITIAL_GAP + LOW_OPENING);
+        }
         //reposition tubes
-        posTopTube.set(x, random.nextInt(FLUCTUATION) + INITIAL_GAP + LOW_OPENING);
+
         posBottomTube.set(x, posTopTube.y - INITIAL_GAP - botttomTube.getHeight());
 
         //reposition rectangles
         boundsTop.setPosition(posTopTube.x, posTopTube.y);
         boundsBottom.setPosition(posBottomTube.x, posBottomTube.y);
+
     }
 
     public boolean collides(Circle player) {
         return Intersector.overlaps(player, boundsTop) || Intersector.overlaps(player, boundsBottom);
     }
+
+
 
     public void dispose() {
         topTube.dispose();

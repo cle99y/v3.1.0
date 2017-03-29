@@ -13,32 +13,35 @@ public class Gran {
     private static final int GRAVITY = -50;
     private static final int MOVEMENT = 150;
     public static int PLAYER_SIZE;
+    public static boolean gravityInversion = false;
     private Vector3 position;
     private Vector3 velocity;
-    private Texture gran;
-    private float ratioHeadHtoW;
+    private Texture gran, ghostGran;
+    public static boolean isGhost = false;
     //public Circle boundsGran;
     public Circle boundsGranTop, boundsGranBottom;
 
 
     public Gran(int x, int y) {
         PLAYER_SIZE = Math.round(FlappyGran.HEIGHT / 10);
-        ratioHeadHtoW = 27 / 35; // gran image dimension
         position = new Vector3(x, y, 0);
         velocity = new Vector3(0, 0, 0);
+        ghostGran = new Texture("ghostgran.png");
         gran = new Texture("gran.png");
         boundsGranTop = new Circle(x, y, (PLAYER_SIZE / 2) * 27/35);
         boundsGranBottom = new Circle(x, y, (PLAYER_SIZE / 2) * 27/35);
-
     }
 
     public void update(float dt) {
         if (position.y > 150)
-            velocity .add(0, GRAVITY, 0);
+            velocity .add(0, setGravity() * GRAVITY, 0);
         velocity.scl(dt);
         position.add(MOVEMENT * dt, velocity.y, 0);
         if (position.y < 150)
             position.y = 150;
+        if (position.y > FlappyGran.HEIGHT - PLAYER_SIZE) {
+            position.y = FlappyGran.HEIGHT - PLAYER_SIZE;
+        }
         boundsGranTop.setPosition(position.x + PLAYER_SIZE / 2, position.y + PLAYER_SIZE - boundsGranTop.radius);
         boundsGranBottom.setPosition(position.x + PLAYER_SIZE / 2, position.y + boundsGranBottom.radius);
         velocity.scl(1/dt);
@@ -50,11 +53,11 @@ public class Gran {
     }
 
     public Texture getGran() {
-        return gran;
+        return (isGhost) ? ghostGran : gran;
     }
 
     public void jump() {
-        velocity.y = 760;
+        velocity.y = setGravity() * 760;
     }
 
     public Circle getBounds(String area) {
@@ -62,6 +65,12 @@ public class Gran {
             return boundsGranTop;
 
         return boundsGranBottom;
+    }
+
+    public float setGravity() {
+        // set a GRAVITY multiplier depending on status of the
+        // gravityInversion flag
+        return (gravityInversion) ? -1.0f : 1.0f;
     }
 
     public void dispose() {
