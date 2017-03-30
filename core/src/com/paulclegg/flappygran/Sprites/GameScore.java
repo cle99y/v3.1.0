@@ -1,6 +1,6 @@
 package com.paulclegg.flappygran.Sprites;
 
-import sun.font.GlyphLayout;
+import com.paulclegg.flappygran.Preferences;
 
 /**
  * Created by cle99 on 26/03/2017.
@@ -8,37 +8,36 @@ import sun.font.GlyphLayout;
 
 public class GameScore {
 
-    private static int score = 0;
-    private GlyphLayout glyph;
-    private float boundsScore;
+    public static int score;
 
-    public GameScore () {
+
+    private GameScore () {
 
     }
 
-    public int addToScore(int x) {
-        int theScore = score += x;
-        if (theScore > com.paulclegg.flappygran.Preferences.getHighScore()) {
-            com.paulclegg.flappygran.Preferences.setHighScore(theScore);
+    public static void addToScore(int x) {
+        score += x;
+        if (score > Preferences.getHighScore()) {
+            Preferences.setHighScore(score);
         }
-        return theScore;
+
     }
 
-    private String repeat(int n, String str){
+    private static String repeat(int n, String str){
         return new String(new char[n]).replace("\0", str);
     }
 
-    public int getScore() {
+    public static int getScore() {
         return score;
     }
 
-    public String scoreToString() {
+    public static String scoreToString() {
         String text =String.valueOf(score);
         int len = text.length();
         return "SCORE: " + repeat(4 - len, "0") + text;
     }
 
-    public void reset() {
+    public static void reset() {
         score = 0;
     }
 

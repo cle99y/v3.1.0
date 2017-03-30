@@ -5,25 +5,8 @@ package com.paulclegg.flappygran.Sprites;
  */
 
 public class MakeEffect {
-//    private String whatToDo;
 
-//    public MakeEffect () {
-//        whatToDo = "NONE";
-//    }
-//
-//    public MakeEffect(String effect) {
-//        whatToDo = effect;
-//        if (whatToDo == "GHOST") {
-//            ghost();
-//        } else if (whatToDo == "GRAVITY") {
-//            gravity();
-//        } else if (whatToDo == "SLIDE") {
-//            slide();
-//        } else {
-//            normal();
-//        }
-//
-//    }
+    private MakeEffect() {  }
 
     public static void ghost() {
         Gran.gravityInversion = false;

@@ -27,15 +27,13 @@ public class Tube {
     private Random random;
     private int TUBE_GAP = Math.round(com.paulclegg.flappygran.FlappyGran.HEIGHT * 0.21f);
     //for testing
-    //private int TUBE_GAP = 500;
+    //private int TUBE_GAP = 350;
     private static int INITIAL_GAP = 100;
-    private GameScore gamescore;
     private SineWave sineWave;
 
 
     public Tube (float x) {
 
-        gamescore = new GameScore();
         topTube = new Texture("toptube.png");
         botttomTube = new Texture("bottomtube.png");
         random = new Random();

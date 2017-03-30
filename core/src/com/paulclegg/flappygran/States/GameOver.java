@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.paulclegg.flappygran.FlappyGran;
 import com.paulclegg.flappygran.Preferences;
+import com.paulclegg.flappygran.Sprites.GameScore;
 
 /**
  * Created by cle99 on 26/03/2017.
@@ -62,6 +63,7 @@ public class GameOver extends States {
                     newGame.x < (camera.viewportWidth + playAgain.getWidth()) / 2 &&
                     newGame.y > camera.viewportHeight * 0.22f &&
                     newGame.y < camera.viewportHeight * 0.22f + playAgain.getHeight()) {
+                GameScore.reset();
                 gsm.set(new PlayState(gsm));
             }
         }

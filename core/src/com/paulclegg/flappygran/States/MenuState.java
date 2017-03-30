@@ -38,6 +38,7 @@ public class MenuState extends States {
 
         levels.add("NORMAL");
         levels.add("DIFFICULT");
+        // Preferences.setDifficulty(Preferences.HARD);
         camera.setToOrtho(false, FlappyGran.WIDTH, FlappyGran.HEIGHT);
         background = new Texture("tutorial.png");
         playBtn = new Texture("play.png");
@@ -50,10 +51,8 @@ public class MenuState extends States {
         difficulty = new Vector3();
         rectangle = new Rectangle();
         sr = new ShapeRenderer();
+        System.out.println("initial difficulty: " + Preferences.getDifficulty());
 
-        if (Preferences.getDifficulty() == 1) {
-
-        }
     }
 
     @Override
@@ -73,7 +72,7 @@ public class MenuState extends States {
                     difficulty.x < (camera.viewportWidth - level0Text.width) / 2 + level0Text.width &&
                     difficulty.y > camera.viewportHeight * 0.2f - level0Text.width &&
                     difficulty.y < camera.viewportHeight * 0.2f) {
-                Preferences.setDifficulty(Preferences.getDifficulty() * -1 + 1); // TODO toggle method
+                Preferences.setDifficulty(1 - Preferences.getDifficulty()); // toggle difficulty
                 gsm.set(new PlayState(gsm));
             }
 
@@ -100,12 +99,12 @@ public class MenuState extends States {
 
         // allow selection of a difficulty level
 
-        level0Text.setText(option_not_selected, levels.get(Preferences.getDifficulty()));
+        level0Text.setText(option_not_selected, levels.get(1 - Preferences.getDifficulty()));
         option_not_selected.draw(sb, level0Text,
                 (camera.viewportWidth - level0Text.width) / 2 - level0Text.width,
                 camera.viewportHeight * 0.2f);
 
-        level1Text.setText(option_selected, levels.get(Preferences.getDifficulty() * -1 + 1));
+        level1Text.setText(option_selected, levels.get(Preferences.getDifficulty()));
         option_selected.draw(sb, level1Text,
                 (camera.viewportWidth - level1Text.width) / 2 + level1Text.width,
                 camera.viewportHeight * 0.2f);
@@ -125,5 +124,8 @@ public class MenuState extends States {
     public void dispose() {
         background.dispose();
         playBtn.dispose();
+        option_selected.dispose();
+        option_not_selected.dispose();
+
     }
 }

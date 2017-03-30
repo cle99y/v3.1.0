@@ -12,6 +12,8 @@ public class Preferences {
     private static final String HIGH_SCORE_HARD = "topscorehard";
     private static final String HIGH_SCORE_EASY = "topscoreeasy";
     private static final String DIFFICULTY = "difficulty";
+    public static final int HARD = 1;
+    public static final int EASY = 0;
 
 
     public Preferences() {
@@ -39,23 +41,28 @@ public class Preferences {
     }
 
     public static void setHighScore(int newHighScore) {
-        if (Preferences.getDifficulty() == 0) {
+        System.out.println("call setHS : new high = " + newHighScore + " difficulty = " + getDifficulty());
+        if (getDifficulty() == EASY) {
             preferences.putInteger(HIGH_SCORE_EASY, newHighScore);
+            preferences.flush();
         } else {
             preferences.putInteger(HIGH_SCORE_HARD, newHighScore);
+            preferences.flush();
         }
-        preferences.flush();
+
     }
 
     public static int getHighScore() {
+        if (getDifficulty() == EASY) {
+            return preferences.getInteger(HIGH_SCORE_EASY);
+        }
         return preferences.getInteger(HIGH_SCORE_HARD);
     }
 
     public static String highScoreToString () {
-        if (Preferences.getDifficulty() == 0) {
+        if (getDifficulty() == EASY) {
             return "Your High Score: " + String.valueOf(preferences.getInteger(HIGH_SCORE_EASY));
-        } else {
-            return "Your High Score: " + String.valueOf(preferences.getInteger(HIGH_SCORE_HARD));
         }
+        return "Your High Score: " + String.valueOf(preferences.getInteger(HIGH_SCORE_HARD));
     }
 }

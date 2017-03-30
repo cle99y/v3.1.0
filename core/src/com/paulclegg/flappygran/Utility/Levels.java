@@ -6,7 +6,12 @@ package com.paulclegg.flappygran.Utility;
 
 public class Levels {
     public static final String[] easy = { "NONE", "NONE", "NONE", "GHOST" };
-    public static final String[] hard = { "NONE", "GRAVITY", "GHOST", "SLIDE" };
+    public static final String[] hard = { "NONE", "GRAVITY", "GRAVITY", "GHOST", "SLIDE", "SLIDE" };
+
+    private Levels() {  }
+
 }
+
+
 
 

@@ -27,17 +27,15 @@ public class Cake {
     private Vector3 cakePosition;
     private boolean cakeEaten;
     private Random random;
-    private GameScore gamescore;
     private String effect;
 
 
     public Cake(float x) {
 
-        effects = (Preferences.getDifficulty() == 0) ? Levels.hard : Levels.easy;
-        for (String e : effects) {
-            System.out.println(e);
-        }
-        gamescore = new GameScore();
+        effects = (Preferences.getDifficulty() == Preferences.HARD) ? Levels.hard : Levels.easy;
+
+        for (String e : effects)  // for testing & debugging
+
         cakeEaten = false;
         random = new Random();
         cupCake = new Texture(Gdx.files.internal("cupcake.png"));
@@ -57,6 +55,7 @@ public class Cake {
     }
 
     public Texture getCake() {
+
         if (getEffect() == "GHOST") {
             return ghostCake;
         } else if (getEffect() == "GRAVITY") {
@@ -64,7 +63,6 @@ public class Cake {
         } else if (getEffect() == "SLIDE") {
             return slideCake;
         }
-
         return cupCake;
     }
 

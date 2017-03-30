@@ -37,7 +37,6 @@ public class PlayState extends States {
     private BitmapFont font;
     private GlyphLayout layout;
     private SpriteBatch batch;
-    public GameScore gameScore;
     private int scoringTube;
     public static boolean gameOver;
     SineWave sineWave;
@@ -46,10 +45,11 @@ public class PlayState extends States {
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
+
         sineWave = new SineWave();
         gameOver = false;
         scoringTube = 0;
-        gameScore = new GameScore();
+        GameScore.score = 0;
         layout = new GlyphLayout();
         font = new BitmapFont(Gdx.files.internal("flappygran.fnt"));
         font.getData().setScale(1.6f);
@@ -102,7 +102,7 @@ public class PlayState extends States {
             }
 
             if (tubes.get(scoringTube).getPosBottomTube().x + Tube.TUBE_WIDTH < gran.getPosition().x ) {
-                gameScore.addToScore(TUBE_POINT);
+                GameScore.addToScore(TUBE_POINT);
                 tube.incrementTubesPassed();
 
                 // reset ghost status
@@ -124,20 +124,15 @@ public class PlayState extends States {
                     gameOver = true;
 
                     // switch to game over screen
-                    gsm.set(new GameOver(gsm, gameScore.getScore()));
+                    gsm.set(new GameOver(gsm, GameScore.getScore()));
                     tube.resetTubes();
 
-                    // check High Score status and reset current score to zero
-                    if (gameScore.getScore() > Preferences.getHighScore()) {
-                        Preferences.setHighScore(gameScore.getScore());
-                    }
-                    gameScore.reset();
                 }
             }
 
             if (!cakes.get(scoringTube).isEaten() && tube.getTubesPassed() > 3) {
                 if (Intersector.overlaps(gran.getBounds("bottom"), cakes.get(scoringTube).getBounds())) {
-                    gameScore.addToScore(CAKE_POINT);
+                    GameScore.addToScore(CAKE_POINT);
                     cakes.get(scoringTube).nowEaten();
                     if (cakes.get(scoringTube).getEffect() == "GRAVITY") {
                         gran.jump(); gran.jump();  //double jump
@@ -185,7 +180,7 @@ public class PlayState extends States {
         font.draw(sb, Preferences.highScoreToString(),
                 (FlappyGran.WIDTH  - layout.width) / 2,
                 camera.viewportHeight * 0.075f);
-        layout.setText(font, gameScore.scoreToString());
+        layout.setText(font, GameScore.scoreToString());
         font.draw(sb, layout,
                 (FlappyGran.WIDTH  - layout.width) / 2,
                 camera.viewportHeight * 0.175f);
@@ -217,6 +212,8 @@ public class PlayState extends States {
     public void dispose() {
         bg.dispose();
         gran.dispose();
+        sr.dispose();
+        font.dispose();
         for (Tube tube : tubes) {
             tube.dispose();
         }
