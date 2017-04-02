@@ -1,6 +1,6 @@
 package com.paulclegg.flappygran.Sprites;
 
-import com.paulclegg.flappygran.Preferences;
+import com.paulclegg.flappygran.Utility.Preferences;
 
 /**
  * Created by cle99 on 26/03/2017.
@@ -17,7 +17,7 @@ public class GameScore {
 
     public static void addToScore(int x) {
         score += x;
-        if (score > Preferences.getHighScore()) {
+        if (score > Preferences.getHighScore(Preferences.getDifficulty())) {
             Preferences.setHighScore(score);
         }
 

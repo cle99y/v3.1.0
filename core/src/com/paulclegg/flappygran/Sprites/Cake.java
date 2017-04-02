@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector3;
 import com.paulclegg.flappygran.FlappyGran;
-import com.paulclegg.flappygran.Preferences;
+import com.paulclegg.flappygran.Utility.Preferences;
 import com.paulclegg.flappygran.Utility.Levels;
 
 import java.util.Random;
@@ -32,7 +32,15 @@ public class Cake {
 
     public Cake(float x) {
 
-        effects = (Preferences.getDifficulty() == Preferences.HARD) ? Levels.hard : Levels.easy;
+        if (Preferences.getDifficulty() == Preferences.EASY) {
+            effects = Levels.easy;
+
+        } else if (Preferences.getDifficulty() == Preferences.MEDIUM) {
+            effects = Levels.medium;
+
+        } else {
+            effects = Levels.hard;
+        }
 
         for (String e : effects)  // for testing & debugging
 
@@ -93,6 +101,7 @@ public class Cake {
     }
 
     public void nowEaten() {
+
 
         cakeEaten = true;
         if (getEffect() == "GHOST") {

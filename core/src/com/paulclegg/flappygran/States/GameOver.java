@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.paulclegg.flappygran.FlappyGran;
-import com.paulclegg.flappygran.Preferences;
+import com.paulclegg.flappygran.Utility.Preferences;
 import com.paulclegg.flappygran.Sprites.GameScore;
 
 /**
@@ -21,6 +21,7 @@ public class GameOver extends States {
 
     private Texture background;
     private Texture gameOver;
+    private Texture settings;
     private Vector3 newGame;
     private Texture playAgain;
     private BitmapFont scoreFont, replayFont;
@@ -43,6 +44,7 @@ public class GameOver extends States {
         gameOver = new Texture("gameover.png");
         background = new Texture("bg.png");
         playAgain = new Texture("playagain.png");
+        settings = new Texture("settings.png");
         newGame = new Vector3();
     }
 
@@ -66,6 +68,13 @@ public class GameOver extends States {
                 GameScore.reset();
                 gsm.set(new PlayState(gsm));
             }
+
+            if (newGame.x > camera.viewportWidth * 0.95f - settings.getWidth() &&
+                    newGame.x < camera.viewportWidth * 0.95f &&
+                    newGame.y > camera.viewportHeight - settings.getHeight() - camera.viewportWidth * 0.05f &&
+                    newGame.y < camera.viewportHeight - camera.viewportWidth * 0.05f) {
+                gsm.set(new MainMenuState(gsm));
+            }
         }
     }
 
@@ -81,10 +90,13 @@ public class GameOver extends States {
         sb.begin();
 
             sb.draw(background, camera.position.x - camera.viewportWidth / 2, 0, camera.viewportWidth, camera.viewportHeight);
+
             sb.draw(gameOver, (camera.viewportWidth - gameOver.getWidth()) / 2,
                     (camera.viewportHeight - gameOver.getHeight()) / 2,
                     gameOver.getWidth(), gameOver.getHeight());
+
             textLayout.setText(scoreFont, "You scored: " + String.valueOf(lastScore));
+
             scoreFont.draw(sb, textLayout,
                     (camera.viewportWidth - textLayout.width) / 2,
                     camera.viewportHeight * 0.15f);
@@ -92,11 +104,18 @@ public class GameOver extends States {
             scoreFont.draw(sb, textLayout,
                     (camera.viewportWidth - textLayout.width) / 2,
                     camera.viewportHeight * 0.1f);
+
             sb.draw(playAgain,
                     (camera.viewportWidth - playAgain.getWidth()) / 2,
                     (camera.viewportHeight * 0.22f),
                     playAgain.getWidth(),
                     playAgain.getHeight());
+
+            sb.draw(settings,
+                    camera.viewportWidth - settings.getWidth() - camera.viewportWidth * 0.05f,
+                    camera.viewportHeight - settings.getHeight() - camera.viewportWidth * 0.05f,
+                    settings.getWidth(),
+                    settings.getHeight());
 
         sb.end();
 

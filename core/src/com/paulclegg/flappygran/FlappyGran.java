@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.paulclegg.flappygran.States.GameStateManager;
-import com.paulclegg.flappygran.States.MenuState;
+import com.paulclegg.flappygran.States.MainMenuState;
 
 public class FlappyGran extends ApplicationAdapter {
 
@@ -30,9 +30,8 @@ public class FlappyGran extends ApplicationAdapter {
 		font = new BitmapFont(Gdx.files.internal("flappygran.fnt"));
 		font.setColor(Color.WHITE);
 		gsm = new GameStateManager();
-		img = new Texture("badlogic.jpg");
 		Gdx.gl.glClearColor(1, 0, 0, 1);
-		gsm.push(new MenuState(gsm));
+		gsm.push(new MainMenuState(gsm));
 	}
 
 	@Override
@@ -46,6 +45,5 @@ public class FlappyGran extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
 	}
 }

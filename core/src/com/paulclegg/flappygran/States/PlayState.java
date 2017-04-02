@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.utils.Array;
 import com.paulclegg.flappygran.FlappyGran;
-import com.paulclegg.flappygran.Preferences;
+import com.paulclegg.flappygran.Utility.Preferences;
 import com.paulclegg.flappygran.Sprites.Cake;
 import com.paulclegg.flappygran.Sprites.GameScore;
 import com.paulclegg.flappygran.Sprites.Gran;
@@ -39,6 +39,7 @@ public class PlayState extends States {
     private SpriteBatch batch;
     private int scoringTube;
     public static boolean gameOver;
+    private boolean collided;
     SineWave sineWave;
 
 
@@ -48,6 +49,7 @@ public class PlayState extends States {
 
         sineWave = new SineWave();
         gameOver = false;
+        collided = false;
         scoringTube = 0;
         GameScore.score = 0;
         layout = new GlyphLayout();
@@ -56,6 +58,7 @@ public class PlayState extends States {
 
         gran = new Gran(50, FlappyGran.HEIGHT / 2);
         MakeEffect.normal();
+        gran.jump();
 
         camera.setToOrtho(false, FlappyGran.WIDTH, FlappyGran.HEIGHT);
         gui.setToOrtho(false, FlappyGran.WIDTH, FlappyGran.HEIGHT);
@@ -87,6 +90,7 @@ public class PlayState extends States {
     @Override
     public void update(float dt) {
         handleInput();
+        System.out.println("collided " + collided);
         gran.update(dt);
         sineWave.getSin();
         camera.position.x = gran.getPosition().x + camera.viewportWidth * 0.25f;
@@ -102,7 +106,7 @@ public class PlayState extends States {
             }
 
             if (tubes.get(scoringTube).getPosBottomTube().x + Tube.TUBE_WIDTH < gran.getPosition().x ) {
-                GameScore.addToScore(TUBE_POINT);
+                if (!collided) GameScore.addToScore(TUBE_POINT);
                 tube.incrementTubesPassed();
 
                 // reset ghost status
@@ -113,22 +117,26 @@ public class PlayState extends States {
                 } else {
                     scoringTube = 0;
                 }
+                collided = false;
             }
 
-            if (!Gran.isGhost) {  // if the ghost effect is implemented, gran can pass through tubes
-
-                // detect collisions between gran and tube or ground
-                if (tube.collides(gran.getBounds("bottom")) ||
-                        tube.collides(gran.getBounds("top")) ||
-                        gran.getPosition().y < FlappyGran.HEIGHT * 0.2f) {
+            // detect collisions between gran and tube or ground
+            if (tube.collides(gran.getBounds("bottom")) ||
+                    tube.collides(gran.getBounds("top")) ||
+                    gran.getPosition().y < FlappyGran.HEIGHT * 0.2f) {
+                if (!Gran.isGhost) {  // if the ghost effect is implemented, gran can pass through tubes
                     gameOver = true;
+                }
+                collided = true;
 
-                    // switch to game over screen
+                // switch to game over screen
+                if (gameOver) {
                     gsm.set(new GameOver(gsm, GameScore.getScore()));
                     tube.resetTubes();
-
                 }
+
             }
+
 
             if (!cakes.get(scoringTube).isEaten() && tube.getTubesPassed() > 3) {
                 if (Intersector.overlaps(gran.getBounds("bottom"), cakes.get(scoringTube).getBounds())) {
@@ -142,6 +150,12 @@ public class PlayState extends States {
             }
         }
         camera.update();
+
+        if (gameOver){
+            Preferences.setGamesPlayed();
+            Preferences.setTotalPoints(GameScore.getScore());
+        }
+
     }
 
     @Override
